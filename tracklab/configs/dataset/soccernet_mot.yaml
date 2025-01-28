@@ -20,6 +20,6 @@ track_eval:
   DO_PREPROC: False
   TRACKER_DISPLAY_NAMES: null
   EVAL_SPACE: 'pitch'
-  USE_JERSEY_NUMBERS: True
+  USE_JERSEY_NUMBERS: False
   USE_TEAMS: True
   USE_ROLES: True

@@ -29,7 +29,7 @@ class SoccerNetGameState(TrackingDataset):
         assert self.dataset_path.exists(), f"'{self.dataset_path}' directory does not exist. Please check the path or download the dataset following the instructions here: https://github.com/SoccerNet/sn-gamestate"
 
         sets = {}
-        for split in ["train", "valid", "test", "challenge"]:
+        for split in ["train"]:
             if os.path.exists(self.dataset_path / split):
                 sets[split] = load_set(self.dataset_path / split, nvid, vids_dict.get(split, []))
             else:
@@ -170,6 +170,19 @@ def extract_category(attributes):
     
     
 def dict_to_df_detections(annotation_dict, categories_list):
+    if not annotation_dict:
+        detections_df = pd.DataFrame(columns=[
+            'id', 'image_id', 'track_id', 'bbox_ltwh', 'bbox_pitch',
+            'team_cluster', 'team', 'role', 'jersey_number', 'position',
+            'category'
+        ])
+        annotation_pitch_camera_df = pd.DataFrame(columns=[
+            'id', 'image_id', 'video_id', 'supercategory', 'lines'
+        ])
+        video_level_categories = []
+        return detections_df, annotation_pitch_camera_df, video_level_categories
+        
+        
     df = pd.DataFrame.from_dict(annotation_dict)
 
     annotations_pitch_camera = df.loc[df['supercategory'] != 'object']   # remove the rows with non-human categories

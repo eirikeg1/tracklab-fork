@@ -21,14 +21,14 @@ class SoccerNetMOT(TrackingDataset):
 
         log.info(f"Loading SoccerNet MOT dataset from {self.dataset_path} ...")
         train_set = load_set(self.dataset_path / "train", nvid, vids_dict["train"])  # 57 videos
-        test_set = load_set(self.dataset_path / "test", nvid, vids_dict["val"])  # 49 videos
+        # test_set = load_set(self.dataset_path / "test", nvid, vids_dict["val"])  # 49 videos
         # challenge_set = load_set(self.dataset_path / "challenge")
         challenge_set = None  #  58 videos
 
         sets = {
             "train": train_set,
-            "test": test_set,
-            "challenge": challenge_set
+            # "test": test_set,
+            # "challenge": challenge_set
         }
 
         super().__init__(dataset_path, sets, nvid=-1, vids_dict=None, *args, **kwargs)

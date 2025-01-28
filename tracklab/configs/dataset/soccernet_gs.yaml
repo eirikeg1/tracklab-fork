@@ -31,4 +31,4 @@ track_eval:  # Used by tracklab/configs/eval/trackeval.yaml
   # When an attribute is enabled, ground truth and predictions that don't share the same value for this attribute are given a '0' similarity score and can therefore not be matched.
   USE_ROLES: True  #
   USE_TEAMS: True  # affects only ground truth / predictions with role=player or role=goalkeeper
-  USE_JERSEY_NUMBERS: True  # affects only ground truth / predictions with role=player or role=goalkeeper
+  USE_JERSEY_NUMBERS: False  # affects only ground truth / predictions with role=player or role=goalkeeper
