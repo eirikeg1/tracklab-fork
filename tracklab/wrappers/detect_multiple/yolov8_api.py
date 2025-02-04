@@ -58,6 +58,7 @@ class YOLOv8(ImageLevelModule):
         ):
             for bbox in results.boxes.cpu().numpy():
                 # check for `person` class
+                # print(f"Detected {bbox.cls} with confidence {bbox.conf}")
                 if bbox.cls == 0 and bbox.conf >= self.cfg.min_confidence:
                     detections.append(
                         pd.Series(
@@ -72,4 +73,21 @@ class YOLOv8(ImageLevelModule):
                         )
                     )
                     self.id += 1
+                elif bbox.cls == 1 and bbox.conf >= self.cfg.min_confidence:
+                    detections.append(
+                        pd.Series(
+                            dict(
+                                image_id=metadata.name,
+                                bbox_ltwh=ltrb_to_ltwh(bbox.xyxy[0], shape),
+                                bbox_conf=bbox.conf[0],
+                                video_id=metadata.video_id,
+                                category_id=4, # 'ball' class in posetrack
+                            ),
+                            name=self.id,
+                        )
+                    )
+                    self.id += 1
+                elif not bbox.cls in [0, 1]:
+                    print(f"Detected {bbox.cls} ({type(bbox.cls)}) with confidence {bbox.conf}")
+                    
         return detections
