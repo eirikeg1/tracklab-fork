@@ -37,6 +37,8 @@ class YOLOv8(ImageLevelModule):
         super().__init__(batch_size)
         self.cfg = cfg
         self.device = device
+        if not os.path.exists(cfg.path_to_checkpoint):
+            log.error(f"Checkpoint path {cfg.path_to_checkpoint} does not exist.\n\n")
         self.model = YOLO(cfg.path_to_checkpoint)
         self.model.to(device)
         self.id = 0
