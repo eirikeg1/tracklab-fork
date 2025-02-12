@@ -37,10 +37,18 @@ class YOLOv8(ImageLevelModule):
         super().__init__(batch_size)
         self.cfg = cfg
         self.device = device
-        if not os.path.exists(cfg.path_to_checkpoint):
-            log.error(f"Checkpoint path {cfg.path_to_checkpoint} does not exist.\n\n")
-        self.model = YOLO(cfg.path_to_checkpoint)
-        self.model.to(device)
+        if not os.path.exists(cfg.path_to_checkpoint_player):
+            log.error(f"Checkpoint path {cfg.path_to_checkpoint_player} does not exist.\n\n")
+        if not os.path.exists(cfg.path_to_checkpoint_ball):
+            log.error(f"Checkpoint path {cfg.path_to_checkpoint_ball} does not exist.\n\n")    
+        
+        # Initilize models
+        self.player_model = YOLO(cfg.path_to_checkpoint_player)
+        self.player_model.to(device)
+        
+        self.ball_model = YOLO(cfg.path_to_checkpoint_ball)
+        self.ball_model.to(device)
+        
         self.id = 0
 
     @torch.no_grad()
@@ -52,16 +60,28 @@ class YOLOv8(ImageLevelModule):
 
     @torch.no_grad()
     def process(self, batch: Any, detections: pd.DataFrame, metadatas: pd.DataFrame):
+
         images, shapes = batch
-        results_by_image = self.model(images)
+        player_results_by_image = self.player_model(
+            images,
+            iou=0.5,
+            imgsz=1280,
+        )
+        ball_results_by_image = self.ball_model(
+            images,
+            iou=0.2,
+            imgsz=1280,
+        )
+            
+        print(f"\n\nNumber of player predictions: {len(player_results_by_image[0])}")
+        print(f"Number of ball predictions: {len(ball_results_by_image[0])}")
+        
         detections = []
         for results, shape, (_, metadata) in zip(
-            results_by_image, shapes, metadatas.iterrows()
+            player_results_by_image, shapes, metadatas.iterrows()
         ):
             for bbox in results.boxes.cpu().numpy():
-                # check for `person` class
-                # print(f"Detected {bbox.cls} with confidence {bbox.conf}")
-                if bbox.cls == 0 and bbox.conf >= self.cfg.min_confidence:
+                if bbox.cls == 0 and bbox.conf >= self.cfg.min_confidence_player:
                     detections.append(
                         pd.Series(
                             dict(
@@ -75,21 +95,25 @@ class YOLOv8(ImageLevelModule):
                         )
                     )
                     self.id += 1
-                elif bbox.cls == 1 and bbox.conf >= self.cfg.min_confidence:
-                    detections.append(
-                        pd.Series(
-                            dict(
-                                image_id=metadata.name,
-                                bbox_ltwh=ltrb_to_ltwh(bbox.xyxy[0], shape),
-                                bbox_conf=bbox.conf[0],
-                                video_id=metadata.video_id,
-                                category_id=4, # 'ball' class in posetrack
-                            ),
-                            name=self.id,
-                        )
-                    )
-                    self.id += 1
-                elif not bbox.cls in [0, 1]:
-                    print(f"Detected {bbox.cls} ({type(bbox.cls)}) with confidence {bbox.conf}")
                     
+        for results, shape, (_, metadata) in zip(
+            ball_results_by_image, shapes, metadatas.iterrows()
+        ):
+            for bbox in results.boxes.cpu().numpy():
+                # print(f"Detected ball ({bbox.cls}) with confidence {bbox.conf}")
+                if bbox.cls == 0 and bbox.conf >= self.cfg.min_confidence_ball:
+                        detections.append(
+                            pd.Series(
+                                dict(
+                                    image_id=metadata.name,
+                                    bbox_ltwh=ltrb_to_ltwh(bbox.xyxy[0], shape),
+                                    bbox_conf=bbox.conf[0],
+                                    video_id=metadata.video_id,
+                                    category_id=4, # 'ball' class in posetrack
+                                ),
+                                name=self.id,
+                            )
+                        )
+                        self.id += 1
+            
         return detections

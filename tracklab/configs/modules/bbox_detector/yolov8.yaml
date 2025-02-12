@@ -1,15 +1,18 @@
 
 _target_: tracklab.wrappers.YOLOv8
-batch_size: 4
+batch_size: 12
 cfg:
   # models available :
   # yolov8n.pt, yolov8s.pt, yolov8m.pt, yolov8l.pt, yolov8x.pt, yolov8x6.pt
   # yolov5nu.pt, yolov5su.pt, yolov5mu.pt, yolov5lu.pt, yolov5xu.pt, yolov5x6u.pt
   # those models will be downloaded automatically if not found in the path
   # path_to_checkpoint: "${model_dir}/yolo/yolov8x6.pt"
-  path_to_checkpoint: "${model_dir}/yolo/yolo11m-player-ball-finetune-epoch-last.pt"
+  path_to_checkpoint_player: "${model_dir}/yolo/yolo11s-player-epoch-50.pt"
+  path_to_checkpoint_ball: "${model_dir}/yolo/yolo11s-ball-epoch-60.pt"
 
   # classes: ['ball', 'goalkeeper', 'player', 'referee']
-  classes: ["person", "ball"]
+
   
-  min_confidence: 0.3
+  min_confidence_player: 0.55
+  min_confidence_ball: 0.2
+

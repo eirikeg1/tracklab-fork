@@ -40,7 +40,7 @@ class YOLOv8Pose(ImageLevelModule):
         super().__init__(batch_size)
         self.cfg = cfg
         self.device = device
-        self.model = YOLO(cfg.path_to_checkpoint)
+        self.model = YOLO(cfg.path_to_checkpoint_player)
         self.model.to(device)
         self.id = 0
 
