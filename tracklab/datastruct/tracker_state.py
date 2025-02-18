@@ -252,23 +252,36 @@ class TrackerState(AbstractContextManager):
         self.save()
 
     def update(self, detections: pd.DataFrame, image_metadata):
+        # Ensure detections has the 'video_id' column.
+        if "video_id" not in detections.columns:
+            detections = detections.copy()
+            detections["video_id"] = self.video_id
+
         if self.detections_pred is None:
             self.detections_pred = detections
             self.image_pred = image_metadata
         else:
-            self.detections_pred = self.detections_pred[
-                ~(self.detections_pred["video_id"] == self.video_id)
-            ]
-            self.detections_pred = pd.concat(
-                [self.detections_pred, detections]
-            )  # TODO UPDATE should update existing rows or append if new rows
-            # updating image metadata
-            self.image_pred = self.image_pred[
-                ~(self.image_pred["video_id"] == self.video_id)
-            ]
-            self.image_pred = pd.concat(
-                [self.image_pred, image_metadata]
-            )
+            if "video_id" in self.detections_pred.columns:
+                self.detections_pred = self.detections_pred[
+                    ~(self.detections_pred["video_id"] == self.video_id)
+                ]
+            else:
+                # Optionally, add the column if missing
+                self.detections_pred = self.detections_pred.copy()
+                self.detections_pred["video_id"] = self.video_id
+
+            self.detections_pred = pd.concat([self.detections_pred, detections])
+            # Similarly, ensure image_metadata has 'video_id' before filtering.
+            if "video_id" in self.image_pred.columns:
+                self.image_pred = self.image_pred[
+                    ~(self.image_pred["video_id"] == self.video_id)
+                ]
+            else:
+                self.image_pred = self.image_pred.copy()
+                self.image_pred["video_id"] = self.video_id
+
+            self.image_pred = pd.concat([self.image_pred, image_metadata])
+
 
     def save(self):
         """
