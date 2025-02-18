@@ -1,0 +1,10 @@
+
+_target_: tracklab.wrappers.YOLOv8
+batch_size: 12
+cfg:
+  # models available :
+  path_to_checkpoint_player: "${model_dir}/yolo/yolo11s-player-best.pt"
+  path_to_checkpoint_ball: "${model_dir}/yolo/yolo11s-ball-best.pt"
+
+  min_confidence_player: 0.55
+  min_confidence_ball: 0.2
