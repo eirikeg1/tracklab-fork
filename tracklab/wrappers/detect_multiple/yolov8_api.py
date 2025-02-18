@@ -73,9 +73,6 @@ class YOLOv8(ImageLevelModule):
             imgsz=1280,
         )
             
-        print(f"\n\nNumber of player predictions: {len(player_results_by_image[0])}")
-        print(f"Number of ball predictions: {len(ball_results_by_image[0])}")
-        
         detections = []
         for results, shape, (_, metadata) in zip(
             player_results_by_image, shapes, metadatas.iterrows()
