@@ -36,7 +36,7 @@ use_wandb: False
 use_rich: True
 
 # Flags
-test_tracking: True
+test_tracking: False
 print_config: False
 eval_tracking: True
 

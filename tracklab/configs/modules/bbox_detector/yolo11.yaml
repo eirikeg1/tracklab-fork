@@ -1,6 +1,6 @@
 
 _target_: tracklab.wrappers.YOLOv8
-batch_size: 12
+batch_size: 3
 cfg:
   # models available :
   path_to_checkpoint_player: "${model_dir}/yolo/yolo11s-player-best.pt"
